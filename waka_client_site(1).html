@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waka Client - Продвинутый чит для Minecraft</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 20px 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #fff, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ccc;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .auth-btn {
+            padding: 10px 25px;
+            background: transparent;
+            border: 2px solid #fff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+
+        .auth-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .hero p {
+            font-size: 24px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 18px 50px;
+            background: linear-gradient(45deg, #fff 0%, #666 100%);
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .features {
+            padding: 80px 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 60px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .download-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .download-section h2 {
+            font-size: 48px;
+            margin-bottom: 30px;
+        }
+
+        .version-info {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .warning {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 40px auto;
+            max-width: 800px;
+        }
+
+        .warning h3 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 2px solid #fff;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #fff;
+            border: none;
+            color: #000;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+
+        .submit-btn:hover {
+            background: #ddd;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .user-panel {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .license-key {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .license-label {
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+
+        .license-value {
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-msg {
+            color: #51cf66;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .logout-btn {
+            padding: 10px 25px;
+            background: transparent;
+            border: 2px solid #fff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">⚡ WAKA CLIENT</div>
+            <ul class="nav-links">
+                <li><a href="#features">Функции</a></li>
+                <li><a href="#download">Скачать</a></li>
+                <li><a href="#support">Поддержка</a></li>
+            </ul>
+            <div class="auth-buttons" id="authButtons">
+                <button class="auth-btn" onclick="openLogin()">Вход</button>
+                <button class="auth-btn" onclick="openRegister()">Регистрация</button>
+            </div>
+            <div id="userInfoNav" style="display: none;">
+                <span style="margin-right: 15px;">Привет, <strong id="navUsername"></strong></span>
+                <button class="logout-btn" onclick="logout()">Выход</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>WAKA CLIENT</h1>
+            <p>Самый продвинутый чит-клиент для Minecraft</p>
+            <a href="#download" class="cta-button" id="heroDownload" onclick="handleDownload(event)">Скачать сейчас</a>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="user-panel" id="userPanel">
+            <div class="user-info-header">
+                <div>
+                    <div class="user-name">Добро пожаловать, <span id="welcomeUser"></span>!</div>
+                    <div style="opacity: 0.7; margin-top: 5px;">Статус: <strong>PREMIUM</strong></div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+            <div class="license-key">
+                <div class="license-label">Ваш лицензионный ключ:</div>
+                <div class="license-value" id="licenseKey"></div>
+                <div style="margin-top: 15px; opacity: 0.7;">Срок действия: <strong>Бессрочно</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Возможности</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚔️</div>
+                    <h3>KillAura</h3>
+                    <p>Автоматическая атака ближайших противников с настраиваемой дистанцией и скоростью</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👁️</div>
+                    <h3>ESP/Wallhack</h3>
+                    <p>Видьте игроков и мобов сквозь стены с настраиваемыми цветами</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏃</div>
+                    <h3>Speed & Fly</h3>
+                    <p>Увеличенная скорость передвижения и возможность полета</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>AimBot</h3>
+                    <p>Автоматическое наведение на цели для лука и других снарядов</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⛏️</div>
+                    <h3>Nuker</h3>
+                    <p>Быстрое разрушение блоков в радиусе действия</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Xray</h3>
+                    <p>Просвечивание блоков для поиска руды и ресурсов</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="warning container">
+        <h3>⚠️ Предупреждение</h3>
+        <p>Использование читов в Minecraft может привести к бану на серверах. Используйте на свой страх и риск. Мы рекомендуем использовать только в одиночной игре или на серверах, где это разрешено.</p>
+    </div>
+
+    <section class="download-section" id="download">
+        <div class="container">
+            <h2>Скачать Waka Client</h2>
+            <div class="version-info">
+                <p><strong>Версия:</strong> 2.5.1</p>
+                <p><strong>Поддержка Minecraft:</strong> 1.8.9 - 1.20.4</p>
+                <p><strong>Размер:</strong> 8.5 MB</p>
+                <p><strong>Обновлено:</strong> 15.12.2024</p>
+            </div>
+            <a href="#" class="cta-button" onclick="handleDownload(event)">Скачать для Windows</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Waka Client. Все права защищены.</p>
+            <p style="margin-top: 10px; opacity: 0.7;">Этот сайт создан только в демонстрационных целях</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Вход в систему</span>
+                <span class="close-btn" onclick="closeLogin()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Имя пользователя:</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль:</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <div class="error-msg" id="loginError"></div>
+                    <button type="submit" class="submit-btn">Войти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Регистрация</span>
+                <span class="close-btn" onclick="closeRegister()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Имя пользователя:</label>
+                        <input type="text" id="regUsername" required minlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="regEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль:</label>
+                        <input type="password" id="regPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Подтвердите пароль:</label>
+                        <input type="password" id="regConfirmPassword" required>
+                    </div>
+                    <div class="error-msg" id="registerError"></div>
+                    <div class="success-msg" id="registerSuccess"></div>
+                    <button type="submit" class="submit-btn">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = {};
+        let currentUser = null;
+
+        function openLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function openRegister() {
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        function closeRegister() {
+            document.getElementById('registerModal').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorMsg = document.getElementById('loginError');
+
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                showUserPanel();
+                closeLogin();
+                errorMsg.style.display = 'none';
+            } else {
+                errorMsg.textContent = 'Неверное имя пользователя или пароль';
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const errorMsg = document.getElementById('registerError');
+            const successMsg = document.getElementById('registerSuccess');
+
+            if (users[username]) {
+                errorMsg.textContent = 'Это имя пользователя уже занято';
+                errorMsg.style.display = 'block';
+                successMsg.style.display = 'none';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorMsg.textContent = 'Пароли не совпадают';
+                errorMsg.style.display = 'block';
+                successMsg.style.display = 'none';
+                return;
+            }
+
+            const licenseKey = generateLicenseKey();
+            users[username] = {
+                email: email,
+                password: password,
+                licenseKey: licenseKey
+            };
+
+            errorMsg.style.display = 'none';
+            successMsg.textContent = 'Аккаунт успешно создан! Теперь вы можете войти.';
+            successMsg.style.display = 'block';
+
+            setTimeout(() => {
+                closeRegister();
+                openLogin();
+                document.getElementById('loginUsername').value = username;
+            }, 2000);
+        }
+
+        function generateLicenseKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    key += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < 3) key += '-';
+            }
+            return key;
+        }
+
+        function showUserPanel() {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userInfoNav').style.display = 'block';
+            document.getElementById('userPanel').style.display = 'block';
+            document.getElementById('navUsername').textContent = currentUser;
+            document.getElementById('welcomeUser').textContent = currentUser;
+            document.getElementById('licenseKey').textContent = users[currentUser].licenseKey;
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userInfoNav').style.display = 'none';
+            document.getElementById('userPanel').style.display = 'none';
+        }
+
+        function handleDownload(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showCustomAlert('Вы должны войти в систему, чтобы скачать Waka Client');
+                setTimeout(() => openLogin(), 100);
+            } else {
+                showCustomAlert('Загрузка начата: WAKA_CLIENT_v2.5.1.exe\n\nЭто демо-версия. Файл не загружается.');
+                
+                // Create and download a dummy file
+                const fileContent = `WAKA CLIENT v2.5.1
+License Key: ${users[currentUser].licenseKey}
+User: ${currentUser}
+
+This is a demo file.
+Thank you for using WAKA Client!`;
+                
+                const blob = new Blob([fileContent], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'WAKA_CLIENT_v2.5.1.exe';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }
+        }
+        
+        function showCustomAlert(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #2a2a2a;
+                border: 2px solid #fff;
+                border-radius: 10px;
+                padding: 0;
+                z-index: 3000;
+                min-width: 400px;
+                box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+            `;
+            
+            alertDiv.innerHTML = `
+                <div style="background: #fff; color: #000; padding: 15px 20px; font-weight: bold; border-radius: 8px 8px 0 0;">
+                    <span style="margin-right: 10px;">🌐</span> file://
+                </div>
+                <div style="padding: 25px; color: #fff; line-height: 1.6;">
+                    ${message.replace(/\n/g, '<br>')}
+                </div>
+                <div style="padding: 0 25px 25px; text-align: right;">
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: #00bcd4;
+                        border: none;
+                        color: #fff;
+                        padding: 10px 30px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        font-size: 14px;
+                    ">OK</button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            if (event.target == loginModal) {
+                closeLogin();
+            }
+            if (event.target == registerModal) {
+                closeRegister();
+            }
+        }
+    </script>
+</body>
+</html>
