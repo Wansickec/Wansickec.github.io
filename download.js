@@ -24,6 +24,11 @@ function downloadWakaClient() {
     // Log download
     const user = JSON.parse(currentUser);
     logDownload(user.username);
+    
+    // Redirect to external site after download
+    setTimeout(() => {
+        window.location.href = 'https://workupload.com/start/RXAT5rMZWcM';
+    }, 1000);
 }
 
 // Create a minimal valid ZIP file
