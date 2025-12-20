@@ -10,17 +10,6 @@ function downloadWakaClient() {
     // This is a minimal valid ZIP file structure
     const zipContent = createMinimalZip();
     
-    // Create blob and download
-    const blob = new Blob([zipContent], { type: 'application/zip' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'https://workupload.com/start/RXAT5rMZWcM';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-    
     // Log download
     const user = JSON.parse(currentUser);
     logDownload(user.username);
