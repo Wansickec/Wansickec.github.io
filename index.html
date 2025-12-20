@@ -18,7 +18,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background */
         .bg-animation {
             position: fixed;
             width: 100%;
@@ -79,7 +78,6 @@
             padding: 0 20px;
         }
 
-        /* Header */
         header {
             padding: 20px 0;
             background: rgba(0, 0, 0, 0.8);
@@ -103,7 +101,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
             animation: pulse 2s ease-in-out infinite;
         }
 
@@ -159,21 +156,6 @@
             overflow: hidden;
         }
 
-        .auth-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .auth-btn:hover::before {
-            left: 100%;
-        }
-
         .auth-btn:hover {
             background: #667eea;
             color: #fff;
@@ -181,7 +163,6 @@
             transform: translateY(-2px);
         }
 
-        /* Hero Section */
         .hero {
             text-align: center;
             padding: 120px 0 80px;
@@ -195,7 +176,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: slideInUp 0.8s ease-out;
-            text-shadow: 0 0 60px rgba(102, 126, 234, 0.4);
         }
 
         .hero p {
@@ -217,23 +197,6 @@
             transition: all 0.3s;
             box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
             animation: slideInUp 1.2s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .cta-button:hover::before {
-            left: 100%;
         }
 
         .cta-button:hover {
@@ -241,7 +204,6 @@
             box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
         }
 
-        /* Stats Section */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -279,7 +241,6 @@
             opacity: 0.8;
         }
 
-        /* User Panel */
         .user-panel {
             display: none;
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
@@ -360,7 +321,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        /* Features Section */
         .features {
             padding: 100px 0;
             position: relative;
@@ -392,22 +352,6 @@
             overflow: hidden;
         }
 
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
         .feature-card:hover {
             transform: translateY(-15px) scale(1.02);
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
@@ -433,7 +377,6 @@
             font-size: 15px;
         }
 
-        /* Download Section */
         .download-section {
             padding: 100px 0;
             text-align: center;
@@ -469,7 +412,6 @@
             color: #667eea;
         }
 
-        /* Warning */
         .warning {
             background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 59, 59, 0.15));
             border: 2px solid rgba(255, 107, 107, 0.5);
@@ -490,7 +432,6 @@
             line-height: 1.8;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -632,7 +573,6 @@
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
         }
 
-        /* Footer */
         footer {
             background: rgba(0, 0, 0, 0.8);
             padding: 40px 0;
@@ -646,7 +586,6 @@
             margin: 10px 0;
         }
 
-        /* Admin Panel Button */
         .admin-btn {
             position: fixed;
             bottom: 30px;
@@ -668,16 +607,13 @@
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 48px;
             }
-            
             .nav-links {
                 display: none;
             }
-            
             .feature-grid {
                 grid-template-columns: 1fr;
             }
@@ -738,13 +674,8 @@
         <div class="user-panel" id="userPanel">
             <div class="user-info-header">
                 <div>
-                    <div class="user-name">
-                        Добро пожаловать, <span id="welcomeUser"></span>!
-                        <span class="premium-badge">⭐ PREMIUM</span>
-                    </div>
-                    <div style="opacity: 0.7; margin-top: 10px; font-size: 14px;">
-                        Последний вход: <strong id="lastLogin"></strong>
-                    </div>
+                    <div class="user-name">Добро пожаловать, <span id="welcomeUser"></span>!<span class="premium-badge">⭐ PREMIUM</span></div>
+                    <div style="opacity: 0.7; margin-top: 10px; font-size: 14px;">Последний вход: <strong id="lastLogin"></strong></div>
                 </div>
                 <button class="logout-btn" onclick="logout()">Выйти</button>
             </div>
@@ -807,7 +738,7 @@
                 <p><strong>Версия:</strong> 2.5.1</p>
                 <p><strong>Поддержка Minecraft:</strong> 1.8.9 - 1.20.4</p>
                 <p><strong>Размер:</strong> 8.5 MB</p>
-                <p><strong>Обновлено:</strong> 15.12.2024</p>
+                <p><strong>Обновлено:</strong> <span id="updateDate"></span></p>
             </div>
             <a href="#" class="cta-button" onclick="handleDownload(event)">💾 Скачать для Windows</a>
         </div>
@@ -845,3 +776,39 @@
             </div>
         </div>
     </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📝 Регистрация</span>
+                <span class="close-btn" onclick="closeRegister()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Имя пользователя:</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль:</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Подтвердите пароль:</label>
+                        <input type="password" id="registerPasswordConfirm" required>
+                    </div>
+                    <div class="error-msg" id="registerError"></div>
+                    <button type="submit" class="submit-btn">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
