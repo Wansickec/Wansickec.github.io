@@ -257,15 +257,7 @@ function copyLicense() {
 // Handle download
 function handleDownload(event) {
     event.preventDefault();
-    
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-        openLogin();
-        return;
-    }
-    
-    alert('Спасибо за загрузку! Файл начнет загружаться...');
-    // In production, this would trigger an actual file download
+    downloadWakaClient();
 }
 
 // Admin panel (placeholder)
