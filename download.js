@@ -1,7 +1,7 @@
 // Function to create and download a zip file
 function downloadWakaClient() {
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
+    // Проверить авторизацию
+    if (!api.isAuthenticated()) {
         openLogin();
         return;
     }
