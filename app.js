@@ -167,7 +167,9 @@ function handleDownload(event) {
 
 // Admin panel (placeholder)
 function openAdminPanel() {
-    alert('Админ панель: ' + db.users.length + ' пользователей в системе');
+    const users = api.getUsers();
+    const downloads = api.getDownloads();
+    alert(`Админ панель:\n${users.length} пользователей\n${downloads.length} загрузок`);
 }
 
 // Close modals when clicking outside
