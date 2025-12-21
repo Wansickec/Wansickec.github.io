@@ -10,6 +10,17 @@ const api = {
         }
     },
 
+    // Проверить, авторизован ли пользователь
+    isAuthenticated() {
+        return !!localStorage.getItem('currentUser') && !!localStorage.getItem('token');
+    },
+
+    // Получить текущего пользователя
+    getCurrentUser() {
+        const user = localStorage.getItem('currentUser');
+        return user ? JSON.parse(user) : null;
+    },
+
     getUsers() {
         return JSON.parse(localStorage.getItem('temka_users') || '[]');
     },
