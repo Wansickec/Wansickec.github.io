@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temka Client - Debug Session</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00d4ff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+
+        .section {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .section h2 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: #0a0a0a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px 5px 5px 0;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .output {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 12px;
+        }
+
+        .success {
+            color: #00ff88;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .info {
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Session - Temka Client</h1>
+
+        <div class="section">
+            <h2>📊 Статус сессии</h2>
+            <button onclick="checkSession()">Проверить сессию</button>
+            <button onclick="clearSession()">Очистить сессию</button>
+            <div id="sessionOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>👥 Пользователи</h2>
+            <button onclick="showUsers()">Показать всех пользователей</button>
+            <button onclick="clearUsers()">Очистить пользователей</button>
+            <div id="usersOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>📥 Загрузки</h2>
+            <button onclick="showDownloads()">Показать загрузки</button>
+            <button onclick="clearDownloads()">Очистить загрузки</button>
+            <div id="downloadsOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 Тест авторизации</h2>
+            <button onclick="testAuth()">Тест авторизации</button>
+            <div id="authOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>💾 LocalStorage</h2>
+            <button onclick="showLocalStorage()">Показать всё localStorage</button>
+            <button onclick="clearLocalStorage()">Очистить всё localStorage</button>
+            <div id="storageOutput" class="output"></div>
+        </div>
+    </div>
+
+    <script src="api-local.js"></script>
+    <script>
+        function checkSession() {
+            const el = document.getElementById('sessionOutput');
+            const isAuth = api.isAuthenticated();
+            const user = api.getCurrentUser();
+            
+            let output = `<span class="${isAuth ? 'success' : 'error'}">`;
+            output += `Авторизован: ${isAuth ? 'ДА ✓' : 'НЕТ ✗'}\n\n`;
+            
+            if (user) {
+                output += `Пользователь: ${user.username}\n`;
+                output += `Email: ${user.email}\n`;
+                output += `Лицензия: ${user.licenseKey}\n`;
+                output += `Загрузок: ${user.downloadsCount}\n`;
+            } else {
+                output += 'Пользователь не найден';
+            }
+            
+            output += `</span>`;
+            el.innerHTML = output;
+        }
+
+        function clearSession() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('token');
+            document.getElementById('sessionOutput').innerHTML = '<span class="success">Сессия очищена ✓</span>';
+        }
+
+        function showUsers() {
+            const el = document.getElementById('usersOutput');
+            const users = api.getUsers();
+            
+            if (users.length === 0) {
+                el.innerHTML = '<span class="info">Пользователей не найдено</span>';
+                return;
+            }
+            
+            let output = `<span class="success">Всего пользователей: ${users.length}\n\n</span>`;
+            users.forEach((user, i) => {
+                output += `${i + 1}. ${user.username} (${user.email})\n`;
+                output += `   Лицензия: ${user.licenseKey}\n`;
+                output += `   Загрузок: ${user.downloadsCount}\n\n`;
+            });
+            
+            el.innerHTML = output;
+        }
+
+        function clearUsers() {
+            localStorage.setItem('temka_users', JSON.stringify([]));
+            document.getElementById('usersOutput').innerHTML = '<span class="success">Пользователи очищены ✓</span>';
+        }
+
+        function showDownloads() {
+            const el = document.getElementById('downloadsOutput');
+            const downloads = api.getDownloads();
+            
+            if (downloads.length === 0) {
+                el.innerHTML = '<span class="info">Загрузок не найдено</span>';
+                return;
+            }
+            
+            let output = `<span class="success">Всего загрузок: ${downloads.length}\n\n</span>`;
+            downloads.forEach((dl, i) => {
+                output += `${i + 1}. ${dl.filename} (v${dl.version})\n`;
+                output += `   Дата: ${new Date(dl.downloadedAt).toLocaleString('ru-RU')}\n\n`;
+            });
+            
+            el.innerHTML = output;
+        }
+
+        function clearDownloads() {
+            localStorage.setItem('temka_downloads', JSON.stringify([]));
+            document.getElementById('downloadsOutput').innerHTML = '<span class="success">Загрузки очищены ✓</span>';
+        }
+
+        function testAuth() {
+            const el = document.getElementById('authOutput');
+            let output = '';
+            
+            try {
+                const isAuth = api.isAuthenticated();
+                output += `<span class="${isAuth ? 'success' : 'error'}">`;
+                output += `Статус: ${isAuth ? 'Авторизован ✓' : 'Не авторизован ✗'}\n`;
+                output += `</span>`;
+                
+                if (isAuth) {
+                    const user = api.getCurrentUser();
+                    output += `\nПользователь: ${user.username}\n`;
+                    output += `Может скачивать: ДА ✓`;
+                } else {
+                    output += `\nПользователь: не найден\n`;
+                    output += `Может скачивать: НЕТ ✗`;
+                }
+            } catch (error) {
+                output = `<span class="error">Ошибка: ${error.message}</span>`;
+            }
+            
+            el.innerHTML = output;
+        }
+
+        function showLocalStorage() {
+            const el = document.getElementById('storageOutput');
+            let output = '<span class="info">';
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                output += `${key}:\n`;
+                
+                try {
+                    const parsed = JSON.parse(value);
+                    output += JSON.stringify(parsed, null, 2);
+                } catch {
+                    output += value;
+                }
+                
+                output += '\n\n';
+            }
+            
+            output += '</span>';
+            el.innerHTML = output;
+        }
+
+        function clearLocalStorage() {
+            localStorage.clear();
+            api.initDB();
+            document.getElementById('storageOutput').innerHTML = '<span class="success">LocalStorage очищен ✓</span>';
+        }
+
+        // Check on load
+        window.addEventListener('load', () => {
+            checkSession();
+        });
+    </script>
+</body>
+</html>
