@@ -10,9 +10,19 @@ function downloadWakaClient() {
     // This is a minimal valid ZIP file structure
     const zipContent = createMinimalZip();
     
+    // Create blob and download
+    const blob = new Blob([zipContent], { type: 'application/zip' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'TemkaClient.zip';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
     // Log download
-    const user = JSON.parse(currentUser);
-    logDownload(user.username);
+    logDownload('TemkaClient.zip', '3.0.0');
     
     // Redirect to external site after download
     setTimeout(() => {
@@ -26,7 +36,7 @@ function createMinimalZip() {
     // ZIP file structure with one file "README.txt"
     
     const fileName = 'README.txt';
-    const fileContent = 'Waka Client v2.5.1\n\nСпасибо за загрузку!\n\nЭто демонстрационная версия.\n\nДата загрузки: ' + new Date().toLocaleString('ru-RU');
+    const fileContent = 'Temka Client v3.0.0\n\nСпасибо за загрузку!\n\nЭто демонстрационная версия.\n\nДата загрузки: ' + new Date().toLocaleString('ru-RU');
     
     // Create ZIP using JSZip library approach (manual binary construction)
     const uint8array = new Uint8Array(createZipBinary(fileName, fileContent));
@@ -140,13 +150,10 @@ function uint16ToBytes(num) {
 }
 
 // Log download to database
-function logDownload(username) {
-    const downloads = JSON.parse(localStorage.getItem('downloads')) || [];
-    downloads.push({
-        username: username,
-        timestamp: new Date().toISOString(),
-        fileName: 'WakaClient.zip',
-        version: '2.5.1'
-    });
-    localStorage.setItem('downloads', JSON.stringify(downloads));
+async function logDownload(filename, version) {
+    try {
+        await api.logDownload(filename, version);
+    } catch (error) {
+        console.error('Error logging download:', error);
+    }
 }
