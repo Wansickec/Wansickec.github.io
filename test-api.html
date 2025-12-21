@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temka Client - API Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00d4ff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+
+        .test-section {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .test-section h2 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: #0a0a0a;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .response {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 12px;
+        }
+
+        .success {
+            color: #00ff88;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .info {
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Temka Client - API Test</h1>
+
+        <div class="test-section">
+            <h2>📊 Статистика</h2>
+            <button onclick="testStats()">Получить статистику</button>
+            <div id="statsResponse" class="response"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Регистрация</h2>
+            <input type="text" id="regUsername" placeholder="Имя пользователя" value="testuser">
+            <input type="email" id="regEmail" placeholder="Email" value="test@example.com">
+            <input type="password" id="regPassword" placeholder="Пароль" value="password123">
+            <input type="password" id="regPasswordConfirm" placeholder="Подтвердить пароль" value="password123">
+            <button onclick="testRegister()">Зарегистрироваться</button>
+            <div id="registerResponse" class="response"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔐 Вход</h2>
+            <input type="text" id="loginUsername" placeholder="Имя пользователя" value="testuser">
+            <input type="password" id="loginPassword" placeholder="Пароль" value="password123">
+            <button onclick="testLogin()">Войти</button>
+            <div id="loginResponse" class="response"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>👤 Профиль</h2>
+            <button onclick="testProfile()">Получить профиль</button>
+            <div id="profileResponse" class="response"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📥 Логирование загрузки</h2>
+            <input type="text" id="downloadFilename" placeholder="Имя файла" value="TemkaClient.zip">
+            <input type="text" id="downloadVersion" placeholder="Версия" value="3.0.0">
+            <button onclick="testDownload()">Логировать загрузку</button>
+            <div id="downloadResponse" class="response"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🚪 Выход</h2>
+            <button onclick="testLogout()">Выйти</button>
+            <div id="logoutResponse" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api'
+            : `${window.location.origin}/api`;
+
+        async function parseResponse(response) {
+            const contentType = response.headers.get('content-type');
+            
+            if (contentType && contentType.includes('application/json')) {
+                return await response.json();
+            } else {
+                const text = await response.text();
+                throw new Error(`Non-JSON response: ${text}`);
+            }
+        }
+
+        async function testStats() {
+            const el = document.getElementById('statsResponse');
+            try {
+                el.innerHTML = '<span class="info">Загрузка...</span>';
+                const response = await fetch(`${API_URL}/stats`);
+                const data = await parseResponse(response);
+                el.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`;
+            } catch (error) {
+                el.innerHTML = `<span class="error">Ошибка: ${error.message}</span>`;
+            }
+        }
+
+        async function testRegister() {
+            const el = document.getElementById('registerResponse');
+            try {
+                el.innerHTML = '<span class="info">Загрузка...</span>';
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('regUsername').value,
+                        email: document.getElementById('regEmail').value,
+                        password: document.getElementById('regPassword').value,
+                        passwordConfirm: document.getElementById('regPasswordConfirm').value
+                    })
+                });
+                const data = await parseResponse(response);
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    el.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`;
+                } else {
+                    el.innerHTML = `<span class="error">${JSON.stringify(data, null, 2)}</span>`;
+                }
+            } catch (error) {
+                el.innerHTML = `<span class="error">Ошибка: ${error.message}</span>`;
+            }
+        }
+
+        async function testLogin() {
+            const el = document.getElementById('loginResponse');
+            try {
+                el.innerHTML = '<span class="info">Загрузка...</span>';
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('loginUsername').value,
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                const data = await parseResponse(response);
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    el.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`;
+                } else {
+                    el.innerHTML = `<span class="error">${JSON.stringify(data, null, 2)}</span>`;
+                }
+            } catch (error) {
+                el.innerHTML = `<span class="error">Ошибка: ${error.message}</span>`;
+            }
+        }
+
+        async function testProfile() {
+            const el = document.getElementById('profileResponse');
+            try {
+                el.innerHTML = '<span class="info">Загрузка...</span>';
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    el.innerHTML = '<span class="error">Токен не найден. Сначала войдите.</span>';
+                    return;
+                }
+                const response = await fetch(`${API_URL}/user/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await parseResponse(response);
+                el.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`;
+            } catch (error) {
+                el.innerHTML = `<span class="error">Ошибка: ${error.message}</span>`;
+            }
+        }
+
+        async function testDownload() {
+            const el = document.getElementById('downloadResponse');
+            try {
+                el.innerHTML = '<span class="info">Загрузка...</span>';
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    el.innerHTML = '<span class="error">Токен не найден. Сначала войдите.</span>';
+                    return;
+                }
+                const response = await fetch(`${API_URL}/download`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filename: document.getElementById('downloadFilename').value,
+                        version: document.getElementById('downloadVersion').value
+                    })
+                });
+                const data = await parseResponse(response);
+                el.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`;
+            } catch (error) {
+                el.innerHTML = `<span class="error">Ошибка: ${error.message}</span>`;
+            }
+        }
+
+        async function testLogout() {
+            const el = document.getElementById('logoutResponse');
+            try {
+                el.innerHTML = '<span class="info">Загрузка...</span>';
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    el.innerHTML = '<span class="error">Токен не найден.</span>';
+                    return;
+                }
+                const response = await fetch(`${API_URL}/logout`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await parseResponse(response);
+                localStorage.removeItem('token');
+                el.innerHTML = `<span class="success">${JSON.stringify(data, null, 2)}</span>`;
+            } catch (error) {
+                el.innerHTML = `<span class="error">Ошибка: ${error.message}</span>`;
+            }
+        }
+
+        // Test connection on load
+        window.addEventListener('load', () => {
+            console.log('API URL:', API_URL);
+            testStats();
+        });
+    </script>
+</body>
+</html>

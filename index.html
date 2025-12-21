@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temka Client - Продвинутый чит для Minecraft</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 20px 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #0099ff);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .auth-btn {
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-btn:hover {
+            background: #00d4ff;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 120px 0 80px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 50%, #00ff88 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 24px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            animation: slideInUp 1s ease-out;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 20px 60px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #0a0a0a;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+            animation: slideInUp 1.2s ease-out;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 212, 255, 0.6);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+            animation: slideInUp 1.4s ease-out;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .user-panel {
+            display: none;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 153, 255, 0.15));
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            animation: slideInUp 0.6s ease-out;
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .user-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .user-name {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .premium-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .license-key {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .license-label {
+            opacity: 0.7;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .license-value {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #00d4ff;
+            font-weight: bold;
+            user-select: all;
+        }
+
+        .copy-btn {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            border: none;
+            color: #0a0a0a;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .features {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 56px;
+            margin-bottom: 70px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 255, 0.1));
+            padding: 40px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 255, 0.2));
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.4);
+            border-color: rgba(0, 212, 255, 0.6);
+        }
+
+        .feature-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .feature-card h3 {
+            font-size: 26px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .download-section {
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .download-section h2 {
+            font-size: 56px;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .version-info {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 153, 255, 0.15));
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .version-info p {
+            margin: 15px 0;
+            font-size: 18px;
+        }
+
+        .version-info strong {
+            color: #00d4ff;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 59, 59, 0.15));
+            border: 2px solid rgba(255, 107, 107, 0.5);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 60px auto;
+            max-width: 900px;
+            backdrop-filter: blur(10px);
+        }
+
+        .warning h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .warning p {
+            line-height: 1.8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 60px rgba(102, 126, 234, 0.4);
+            border-radius: 25px;
+            overflow: hidden;
+            animation: slideInUp 0.4s ease-out;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: #0a0a0a;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 32px;
+            line-height: 1;
+            transition: transform 0.3s;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            color: #fff;
+            padding: 15px;
+            font-size: 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.15);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            border: none;
+            color: #0a0a0a;
+            padding: 18px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+            padding: 10px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .success-msg {
+            color: #51cf66;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+            padding: 10px;
+            background: rgba(81, 207, 102, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(81, 207, 102, 0.3);
+        }
+
+        .logout-btn {
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-radius: 25px;
+        }
+
+        .logout-btn:hover {
+            background: #00d4ff;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(0, 212, 255, 0.3);
+            margin-top: 80px;
+        }
+
+        footer p {
+            opacity: 0.7;
+            margin: 10px 0;
+        }
+
+        .admin-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            color: #0a0a0a;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 48px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="stars" id="stars"></div>
+
+    <header>
+        <nav class="container">
+            <div class="logo">⚡ TEMKA CLIENT</div>
+            <ul class="nav-links">
+                <li><a href="#features">Функции</a></li>
+                <li><a href="#download">Скачать</a></li>
+                <li><a href="#support">Поддержка</a></li>
+            </ul>
+            <div class="auth-buttons" id="authButtons">
+                <button class="auth-btn" onclick="openLogin()">Вход</button>
+                <button class="auth-btn" onclick="openRegister()">Регистрация</button>
+            </div>
+            <div id="userInfoNav" style="display: none;">
+                <span style="margin-right: 15px;">👋 <strong id="navUsername"></strong></span>
+                <button class="logout-btn" onclick="logout()">Выход</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>TEMKA CLIENT</h1>
+            <p>Самый продвинутый чит-клиент для Minecraft</p>
+            <a href="#download" class="cta-button" id="heroDownload" onclick="handleDownload(event)">Скачать сейчас</a>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="userCount">0</div>
+                <div class="stat-label">Пользователей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15K+</div>
+                <div class="stat-label">Загрузок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4.9★</div>
+                <div class="stat-label">Рейтинг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Поддержка</div>
+            </div>
+        </div>
+
+        <div class="user-panel" id="userPanel">
+            <div class="user-info-header">
+                <div>
+                    <div class="user-name">Добро пожаловать, <span id="welcomeUser"></span>!<span class="premium-badge">⭐ PREMIUM</span></div>
+                    <div style="opacity: 0.7; margin-top: 10px; font-size: 14px;">Последний вход: <strong id="lastLogin"></strong></div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+            <div class="license-key">
+                <div class="license-label">🔑 Ваш лицензионный ключ:</div>
+                <div class="license-value" id="licenseKey"></div>
+                <button class="copy-btn" onclick="copyLicense()">📋 Копировать ключ</button>
+                <div style="margin-top: 20px; opacity: 0.7;">Срок действия: <strong style="color: #51cf66;">Бессрочно</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2>🎮 Возможности</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚔️</div>
+                    <h3>KillAura</h3>
+                    <p>Автоматическая атака ближайших противников с настраиваемой дистанцией, скоростью и приоритетами целей</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👁️</div>
+                    <h3>ESP/Wallhack</h3>
+                    <p>Видьте игроков и мобов сквозь стены с настраиваемыми цветами и информацией о здоровье</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏃</div>
+                    <h3>Speed & Fly</h3>
+                    <p>Увеличенная скорость передвижения и возможность полета с различными режимами</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>AimBot</h3>
+                    <p>Автоматическое наведение на цели для лука и других снарядов с предсказанием траектории</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⛏️</div>
+                    <h3>Nuker</h3>
+                    <p>Быстрое разрушение блоков в радиусе действия с фильтрацией по типу блоков</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Xray</h3>
+                    <p>Просвечивание блоков для поиска руды и ресурсов с настраиваемыми фильтрами</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="warning container">
+        <h3>⚠️ Важное предупреждение</h3>
+        <p>Использование читов в Minecraft может привести к бану на серверах. Используйте на свой страх и риск. Мы настоятельно рекомендуем использовать только в одиночной игре или на серверах, где это разрешено администрацией.</p>
+    </div>
+
+    <section class="download-section" id="download">
+        <div class="container">
+            <h2>📥 Скачать Temka Client</h2>
+            <div class="version-info">
+                <p><strong>Версия:</strong> 3.0.0</p>
+                <p><strong>Поддержка Minecraft:</strong> 1.8.9 - 1.20.4</p>
+                <p><strong>Размер:</strong> 12.5 MB</p>
+                <p><strong>Обновлено:</strong> <span id="updateDate"></span></p>
+            </div>
+            <a href="#" class="cta-button" onclick="handleDownload(event)">💾 Скачать для Windows</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Temka Client. Все права защищены.</p>
+            <p style="margin-top: 10px;">Этот сайт создан только в демонстрационных целях</p>
+        </div>
+    </footer>
+
+    <button class="admin-btn" onclick="openAdminPanel()">👑 Админ</button>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🔐 Вход в систему</span>
+                <span class="close-btn" onclick="closeLogin()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Имя пользователя:</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль:</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <div class="error-msg" id="loginError"></div>
+                    <button type="submit" class="submit-btn">Войти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📝 Регистрация</span>
+                <span class="close-btn" onclick="closeRegister()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Имя пользователя:</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль:</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Подтвердите пароль:</label>
+                        <input type="password" id="registerPasswordConfirm" required>
+                    </div>
+                    <div class="error-msg" id="registerError"></div>
+                    <button type="submit" class="submit-btn">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-local.js"></script>
+    <script src="download.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
