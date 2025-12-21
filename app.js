@@ -26,75 +26,17 @@ function updateDate() {
     document.getElementById('updateDate').textContent = date.toLocaleDateString('ru-RU', options);
 }
 
-// Simulated database (localStorage)
-const db = {
-    users: JSON.parse(localStorage.getItem('users')) || [],
-    
-    addUser(username, email, password) {
-        const user = {
-            id: Date.now(),
-            username,
-            email,
-            password: this.hashPassword(password),
-            licenseKey: this.generateLicenseKey(),
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString(),
-            premium: true
-        };
-        this.users.push(user);
-        this.save();
-        return user;
-    },
-    
-    findUser(username) {
-        return this.users.find(u => u.username === username);
-    },
-    
-    findUserByEmail(email) {
-        return this.users.find(u => u.email === email);
-    },
-    
-    updateLastLogin(username) {
-        const user = this.findUser(username);
-        if (user) {
-            user.lastLogin = new Date().toISOString();
-            this.save();
-        }
-    },
-    
-    hashPassword(password) {
-        // Simple hash (in production use bcrypt or similar)
-        return btoa(password);
-    },
-    
-    verifyPassword(password, hash) {
-        return btoa(password) === hash;
-    },
-    
-    generateLicenseKey() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let key = '';
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 5; j++) {
-                key += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            if (i < 3) key += '-';
-        }
-        return key;
-    },
-    
-    save() {
-        localStorage.setItem('users', JSON.stringify(this.users));
-    },
-    
-    getUserCount() {
-        return this.users.length;
-    }
-};
+// Database functions using real API
 
-// Load user count
-function loadUserCount() {
-    document.getElementById('userCount').textContent = db.getUserCount();
+// Load user count from API
+async function loadUserCount() {
+    try {
+        const stats = await api.getStats();
+        document.getElementById('userCount').textContent = stats.totalUsers;
+    } catch (error) {
+        console.error('Error loading user count:', error);
+        document.getElementById('userCount').textContent = '0';
+    }
 }
 
 // Modal functions
@@ -117,42 +59,31 @@ function closeRegister() {
 }
 
 // Handle login
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
     
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
     const errorMsg = document.getElementById('loginError');
     
-    const user = db.findUser(username);
-    
-    if (!user) {
-        errorMsg.textContent = 'Пользователь не найден';
+    try {
+        const result = await api.login(username, password);
+        
+        closeLogin();
+        showUserPanel(result.user);
+        updateNavigation(result.user);
+        
+        // Clear form
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+    } catch (error) {
+        errorMsg.textContent = error.message;
         errorMsg.style.display = 'block';
-        return;
     }
-    
-    if (!db.verifyPassword(password, user.password)) {
-        errorMsg.textContent = 'Неверный пароль';
-        errorMsg.style.display = 'block';
-        return;
-    }
-    
-    // Login successful
-    db.updateLastLogin(username);
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    
-    closeLogin();
-    showUserPanel(user);
-    updateNavigation(user);
-    
-    // Clear form
-    document.getElementById('loginUsername').value = '';
-    document.getElementById('loginPassword').value = '';
 }
 
 // Handle register
-function handleRegister(event) {
+async function handleRegister(event) {
     event.preventDefault();
     
     const username = document.getElementById('registerUsername').value;
@@ -161,51 +92,23 @@ function handleRegister(event) {
     const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
     const errorMsg = document.getElementById('registerError');
     
-    // Validation
-    if (username.length < 3) {
-        errorMsg.textContent = 'Имя пользователя должно быть не менее 3 символов';
+    try {
+        const result = await api.register(username, email, password, passwordConfirm);
+        
+        closeRegister();
+        showUserPanel(result.user);
+        updateNavigation(result.user);
+        loadUserCount();
+        
+        // Clear form
+        document.getElementById('registerUsername').value = '';
+        document.getElementById('registerEmail').value = '';
+        document.getElementById('registerPassword').value = '';
+        document.getElementById('registerPasswordConfirm').value = '';
+    } catch (error) {
+        errorMsg.textContent = error.message;
         errorMsg.style.display = 'block';
-        return;
     }
-    
-    if (db.findUser(username)) {
-        errorMsg.textContent = 'Пользователь с таким именем уже существует';
-        errorMsg.style.display = 'block';
-        return;
-    }
-    
-    if (db.findUserByEmail(email)) {
-        errorMsg.textContent = 'Email уже зарегистрирован';
-        errorMsg.style.display = 'block';
-        return;
-    }
-    
-    if (password !== passwordConfirm) {
-        errorMsg.textContent = 'Пароли не совпадают';
-        errorMsg.style.display = 'block';
-        return;
-    }
-    
-    if (password.length < 6) {
-        errorMsg.textContent = 'Пароль должен быть не менее 6 символов';
-        errorMsg.style.display = 'block';
-        return;
-    }
-    
-    // Create user
-    const user = db.addUser(username, email, password);
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    
-    closeRegister();
-    showUserPanel(user);
-    updateNavigation(user);
-    loadUserCount();
-    
-    // Clear form
-    document.getElementById('registerUsername').value = '';
-    document.getElementById('registerEmail').value = '';
-    document.getElementById('registerPassword').value = '';
-    document.getElementById('registerPasswordConfirm').value = '';
 }
 
 // Show user panel
@@ -229,8 +132,8 @@ function updateNavigation(user) {
 }
 
 // Logout
-function logout() {
-    localStorage.removeItem('currentUser');
+async function logout() {
+    await api.logout();
     document.getElementById('userPanel').style.display = 'none';
     document.getElementById('authButtons').style.display = 'flex';
     document.getElementById('userInfoNav').style.display = 'none';
